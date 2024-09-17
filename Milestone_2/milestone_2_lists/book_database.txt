@@ -1,1 +1,1 @@
-[{"name": "The Odyssey", "author": "Homer", "read": true}]
+[{"name": "foo", "author": "bar", "read": true}, {"name": "a", "author": "hbfd", "read": false}]

@@ -1,3 +1,6 @@
+"""main file for running menu"""
+import time
+
 from utils import database
 
 USER_CHOICE = """
@@ -25,10 +28,11 @@ def menu():
             prompt_to_delete()
         elif user_input not in menu_selection:
             print(f"{user_input} is not a valid choice. Please try again")
-
+        time.sleep(2)
         user_input = input(USER_CHOICE)
-#ask user to add book
+
 def prompt_to_add_book():
+    """ask user to add book"""
     book_title = input("Enter book title: ")
     book_author = input("Enter book author: ")
     book_read = input("Have you read this book? (y/n): ")
@@ -51,10 +55,10 @@ def prompt_to_mark():
     book_author = input("Enter the author of the book you would like to mark as read: ")
     found_book = database.find_book({"name": book_name, "author":book_author})
     if found_book and found_book["read"]:
-        print_to_user(f"{found_book["name"]} by {found_book["author"]} is already marked as read.")
+        print_to_user(f"{found_book['name']} by {found_book['author']} is already marked as read.")
     elif found_book:
         book_marked = database.mark_book_as_read(found_book)
-        print_to_user(f"{book_marked["name"]} is marked as read.")
+        print_to_user(f"{book_marked['name']} is marked as read.")
     else:
         print_to_user(f"{book_name} by {book_author} was not found. Please try again.")
     return True
@@ -65,10 +69,10 @@ def prompt_to_delete():
     book_author = input("Enter the author of the book you would like to delete: ")
     found_book = database.find_book({"name": book_name, "author":book_author})
     if found_book:
-        confirm = input(f"Are you sure you want to delete {found_book["name"]} by {found_book["author"]}? (y/n")
+        confirm = input(f"Are you sure you want to delete {found_book['name']} by {found_book['author']}? (y/n)")
         if confirm == 'y':
             deleted_book = database.delete_book(found_book)
-            print_to_user(f"{deleted_book["name"]} by {deleted_book["author"]} was deleted.")
+            print_to_user(f"{deleted_book['name']} by {deleted_book['author']} was deleted.")
         else:
             print_to_user(f"{book_name} by {book_author} was NOT deleted.")
     else:
