@@ -1,6 +1,6 @@
 """main file for running menu"""
 import time
-
+from utils import sqldatabase
 from utils import database
 
 USER_CHOICE = """
@@ -15,6 +15,7 @@ Your choice:
 """
 menu_selection = ['a','q','l','r','d']
 def menu():
+    sqldatabase.create_db()
     user_input = input(USER_CHOICE)
     while user_input != 'q':
         if user_input == "a":
