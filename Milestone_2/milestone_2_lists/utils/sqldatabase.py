@@ -10,63 +10,51 @@ def connect_to_db():
 
 def create_db():
     sql_cursor, sql_connection = connect_to_db()
-    sql_cursor.execute('CREATE TABLE books(name text primary key, author text, read integer)')
+    sql_cursor.execute('CREATE TABLE IF NOT EXISTS books(name text primary key, author text, read integer)')
     sql_connection.commit()
     sql_connection.close()
 
 
 def add_book(book):
-    # get books
-    current_books = get_books()
-    # write new book
-    current_books['books'].append(book)
-    success = write_books(current_books)
-    if success:
-        return f"{book['name']} was added!"
-    else:
-        return f"{book['name']} was not added!"
-
-
-def write_books(book_list):
-    with open('book_database.txt', 'w') as file:
-        json.dump(book_list, file)
-    return True
-
+    sql_cursor, sql_connection = connect_to_db()
+    sql_cursor.execute('INSERT INTO books VALUES(?, ?, ?)',(book["name"],book["author"],book["read"]))
+    sql_connection.commit()
+    sql_connection.close()
+    return f"{book['name']} was added!"
 
 def get_books():
-    with open('book_database.txt', 'r') as file:
-        try:
-            book_list = json.loads(file.read())
-        except JSONDecodeError:
-            book_list = defaultdict(list)
-    return book_list
+    sql_cursor, sql_connection = connect_to_db()
+    sql_cursor.execute('SELECT * FROM books')
+    books = [{'name': row[0], 'author': row[1], 'read': bool(row[2])} for row in sql_cursor.fetchall()]
+    sql_connection.close()
+    return books
 
 
 def find_book(look_book):
-    current_books = get_books()
-    found_book = False
-    for book in current_books['books']:
-        if book['name'] == look_book['name'] and book['author'] == look_book['author']:
-            found_book = book
+    found_book = []
+    sql_cursor, sql_connection = connect_to_db()
+    sql_cursor.execute('SELECT * FROM books WHERE name = ?', (look_book["name"],))
+    result = sql_cursor.fetchall()
+    if len(result) > 0:
+        found_book = [{'name': row[0], 'author': row[1], 'read': row[2] == 1} for row in result]
+        print(found_book)
+    sql_connection.close()
     return found_book
 
 
 def mark_book_as_read(found_book):
-    current_books = get_books()
-    marked_book = False
-    for book in current_books['books']:
-        if book['name'] == found_book['name'] and book['author'] == found_book['author']:
-            marked_book = book
-            marked_book['read'] = True
-    write_books(current_books)
-    return marked_book
+    sql_cursor, sql_connection = connect_to_db()
+    sql_cursor.execute("SELECT * FROM books WHERE name = ?", (found_book["name"],))
+    sql_cursor.execute("UPDATE books SET read = 1 WHERE name = ?", (found_book["name"],))
+    sql_connection.commit()
+    sql_connection.close()
+    updated_book = find_book(found_book)
+    return updated_book
 
 
 def delete_book(book_to_delete):
-    current_books = get_books()
-    new_books = []
-    for book in current_books['books']:
-        if book != book_to_delete:
-            new_books.append(book)
-    write_books(new_books)
+    sql_cursor, sql_connection = connect_to_db()
+    sql_cursor.execute('DELETE FROM books WHERE name = ?', (book_to_delete["name"],))
+    sql_connection.commit()
+    sql_connection.close()
     return book_to_delete
