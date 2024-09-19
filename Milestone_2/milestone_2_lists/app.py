@@ -14,7 +14,7 @@ Enter:
 Your choice:
 """
 menu_selection = ['a','q','l','r','d']
-def menu():
+def menu() -> None:
     sqldatabase.create_db()
     user_input = input(USER_CHOICE)
     while user_input != 'q':
@@ -32,7 +32,7 @@ def menu():
         time.sleep(2)
         user_input = input(USER_CHOICE)
 
-def prompt_to_add_book():
+def prompt_to_add_book() -> bool:
     """ask user to add book"""
     book_title = input("Enter book title: ")
     book_author = input("Enter book author: ")
@@ -47,7 +47,7 @@ def prompt_to_add_book():
     return True
 
 #mark book as read
-def prompt_to_mark():
+def prompt_to_mark() -> bool:
     #prompt for book title
     book_name = input("Enter the name of the book you would like to mark as read: ")
     found_book = sqldatabase.find_book({"name": book_name})[0]
