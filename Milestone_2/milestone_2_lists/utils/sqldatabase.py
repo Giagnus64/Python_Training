@@ -1,28 +1,31 @@
 """ Storing and retrieving from a DB"""
 import sqlite3
-from collections import defaultdict
-from json import JSONDecodeError
+from typing import List, Dict, Union
+
+
+Books = List[Dict[str, Union[str, bool]]]
+
 
 def connect_to_db():
     connection = sqlite3.connect('books.db')
     cursor = connection.cursor()
     return cursor, connection
 
-def create_db():
+def create_db() -> None:
     sql_cursor, sql_connection = connect_to_db()
     sql_cursor.execute('CREATE TABLE IF NOT EXISTS books(name text primary key, author text, read integer)')
     sql_connection.commit()
     sql_connection.close()
 
 
-def add_book(book):
+def add_book(book) -> str:
     sql_cursor, sql_connection = connect_to_db()
     sql_cursor.execute('INSERT INTO books VALUES(?, ?, ?)',(book["name"],book["author"],book["read"]))
     sql_connection.commit()
     sql_connection.close()
     return f"{book['name']} was added!"
 
-def get_books():
+def get_books() -> Books:
     sql_cursor, sql_connection = connect_to_db()
     sql_cursor.execute('SELECT * FROM books')
     books = [{'name': row[0], 'author': row[1], 'read': bool(row[2])} for row in sql_cursor.fetchall()]
@@ -30,7 +33,7 @@ def get_books():
     return books
 
 
-def find_book(look_book):
+def find_book(look_book) -> Books:
     found_book = []
     sql_cursor, sql_connection = connect_to_db()
     sql_cursor.execute('SELECT * FROM books WHERE name = ?', (look_book["name"],))
@@ -42,7 +45,7 @@ def find_book(look_book):
     return found_book
 
 
-def mark_book_as_read(found_book):
+def mark_book_as_read(found_book) -> Books:
     sql_cursor, sql_connection = connect_to_db()
     sql_cursor.execute("SELECT * FROM books WHERE name = ?", (found_book["name"],))
     sql_cursor.execute("UPDATE books SET read = 1 WHERE name = ?", (found_book["name"],))
@@ -52,7 +55,7 @@ def mark_book_as_read(found_book):
     return updated_book
 
 
-def delete_book(book_to_delete):
+def delete_book(book_to_delete) -> Books:
     sql_cursor, sql_connection = connect_to_db()
     sql_cursor.execute('DELETE FROM books WHERE name = ?', (book_to_delete["name"],))
     sql_connection.commit()
