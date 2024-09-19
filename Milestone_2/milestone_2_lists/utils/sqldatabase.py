@@ -1,11 +1,13 @@
 """ Storing and retrieving from a DB"""
 import sqlite3
+from sqlite3 import Connection, Cursor
+
 
 Books = list[dict[str, str|bool]]
 Book = dict[str, str]
 
-def connect_to_db():
-    connection = sqlite3.connect('books.db')
+def connect_to_db() -> (Cursor, Connection):
+    connection: Connection = sqlite3.connect('books.db')
     cursor = connection.cursor()
     return cursor, connection
 
