@@ -1,8 +1,8 @@
 import requests
-
+import logging
 from pages.book_page import BookPage
 
-
+logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)-8s - %(message)s', level=logging.INFO)
 page_content = requests.get('http://books.toscrape.com').content
 page = BookPage(page_content)
 
